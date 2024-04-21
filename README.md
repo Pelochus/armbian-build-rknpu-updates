@@ -4,13 +4,16 @@ This forks purposes is to run LLMs on Rockchip devices with NPUs using RKLLM. Ch
 - https://github.com/Pelochus/ezrknpu
 - https://github.com/Pelochus/ezrknn-llm
 
+Also you may want to take a look at the modified kernel:
+- https://github.com/Pelochus/linux-rockchip-npu-0.9.6
+
 ## Building
 
 ```bash
 apt-get -y install git
 git clone --depth=1 --branch=main https://github.com/Pelochus/armbian-build-rknpu-0.9.6
 cd build
-./compile.sh KERNEL_PF=shallow
+./compile.sh KERNEL_GIT=shallow
 ```
 
 Then, it will asks you for some configurations. I would choose the following:
