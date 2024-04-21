@@ -12,7 +12,7 @@ Also you may want to take a look at the modified kernel:
 ```bash
 apt-get -y install git
 git clone --depth=1 --branch=main https://github.com/Pelochus/armbian-build-rknpu-0.9.6
-cd build
+cd armbian-build-rknpu-0.9.6
 ./compile.sh KERNEL_GIT=shallow
 ```
 
