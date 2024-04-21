@@ -13,7 +13,7 @@ Also you may want to take a look at the modified kernel:
 apt-get -y install git
 git clone --depth=1 --branch=main https://github.com/Pelochus/armbian-build-rknpu-0.9.6
 cd armbian-build-rknpu-0.9.6
-./compile.sh KERNEL_GIT=shallow
+./compile.sh KERNEL_GIT=shallow # If giving problems, you could try with sudo, but not recommended
 ```
 
 Then, it will asks you for some configurations. I would choose the following:
