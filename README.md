@@ -18,12 +18,16 @@ Then, it will asks you for some configurations. I would choose the following:
 - Board: **Select your board** I use Orange Pi 5. Other supported are OPi 5 Plus, Rock Pi 5...
 - Kernel: **Select vendor**
 - Release: **Jammy**, since its closer to Ubuntu, hence easier to use. You can choose Bookworm if you prefer Debian
-- Desktop: **Personal preference, use CLI if low on RAM**
+- Desktop: **Choose based on personal preference, use CLI if low on RAM**
 - Minimal/Standard: **Standard** unless you really prefer installing your packages by yourself, but not worth the effort usually
 
-Then, if everything goes alright, output image will be in `output/images`. Flash it and you are done!
+Then, if everything goes alright, output image will be in `output/images`. Flash it to your SD card and you are done!
 
-If not, check Armbian documentation
+If not, check Armbian documentation or README below
+
+## References
+- https://forum.armbian.com/topic/11082-what-is-the-correct-process-for-integratingbuilding-a-custom-kernel-source/
+- https://docs.armbian.com/Developer-Guide_Build-Options/
 
 ## Original README starts below
 
