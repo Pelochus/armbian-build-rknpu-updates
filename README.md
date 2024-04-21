@@ -1,3 +1,36 @@
+# Modified Armbian for running 0.9.6 RKNPU with Kernel 6.1
+
+This forks purposes is to run LLMs on Rockchip devices with NPUs using RKLLM. Check the following links:
+- https://github.com/Pelochus/ezrknpu
+- https://github.com/Pelochus/ezrknn-llm
+
+## Building
+
+```bash
+apt-get -y install git
+git clone --depth=1 --branch=main https://github.com/Pelochus/armbian-build-rknpu-0.9.6
+cd build
+./compile.sh KERNEL_PF=shallow
+```
+
+Then, it will asks you for some configurations. I would choose the following:
+- Change kernel config? **No** (unless you are sure what you're doing)
+- Board: **Select your board** I use Orange Pi 5. Other supported are OPi 5 Plus, Rock Pi 5...
+- Kernel: **Select vendor**
+- Release: **Jammy**, since its closer to Ubuntu, hence easier to use. You can choose Bookworm if you prefer Debian
+- Desktop: **Personal preference, use CLI if low on RAM**
+- Minimal/Standard: **Standard** unless you really prefer installing your packages by yourself, but not worth the effort usually
+
+Then, if everything goes alright, output image will be in `output/images`. Flash it and you are done!
+
+If not, check Armbian documentation
+
+## Original README starts below
+
+<hr>
+<hr>
+<hr>
+
 <p align="center">
   <a href="#build-framework">
   <img src=".github/armbian-logo.png" alt="Armbian logo" width="144">
