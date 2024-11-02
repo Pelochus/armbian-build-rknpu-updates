@@ -9,6 +9,7 @@
 
 ARCH="arm64"
 KERNEL_IMAGE_TYPE="Image"
+OVERLAY_DIR="/boot/dtb/freescale/overlay"
 SRC_EXTLINUX="yes" # use extlinux as default
 IMX_FIRMWARE="${IMX_FIRMWARE:-"firmware-imx-8.12"}"
 # ATF_PLAT musst set in board
@@ -25,13 +26,11 @@ case $BOARD in
 		LINUXCONFIG='linux-tqma-'$BRANCH # one config for "tq arm modules"
 		case $BRANCH in
 
-    		current) # active lts mainline kernel
-				KERNEL_MAJOR_MINOR="6.6"
-				KERNELBRANCH='branch:linux-6.6.y'
-				KERNELPATCHDIR='imx8m-current'
+			current) # mainline stable kernel
+				KERNEL_MAJOR_MINOR="6.11"
 				;;
 
-    		edge|default) # use for tests with recent mainline kernels
+			edge | default) # use for tests with recent mainline kernels
 				;;
 
 		esac

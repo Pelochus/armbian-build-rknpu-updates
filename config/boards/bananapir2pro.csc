@@ -4,6 +4,7 @@ BOARDFAMILY="rockchip64"
 BOARD_MAINTAINER=""
 BOOTCONFIG="bpi-r2-pro-rk3568_defconfig"
 KERNEL_TARGET="current,edge"
+KERNEL_TEST_TARGET="current"
 FULL_DESKTOP="yes"
 BOOT_LOGO="desktop"
 BOOT_FDT_FILE="rockchip/rk3568-bpi-r2-pro.dtb"
@@ -16,9 +17,4 @@ IMAGE_PARTITION_TABLE="gpt"
 
 function post_family_config___mainline_uboot() {
 	declare -g UBOOT_TARGET_MAP="ROCKCHIP_TPL=${RKBIN_DIR}/${DDR_BLOB} BL31=$RKBIN_DIR/$BL31_BLOB spl/u-boot-spl u-boot.bin flash.bin;;idbloader.img u-boot.itb"
-}
-
-function add_host_dependencies__uboot_deps() {
-	display_alert "Adding python3-pyelftools for brute force mainline uboot" "${EXTENSION}" "info"
-	declare -g EXTRA_BUILD_DEPS="${EXTRA_BUILD_DEPS} python3-pyelftools"
 }

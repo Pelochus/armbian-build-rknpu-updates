@@ -49,8 +49,6 @@ gtk2-engines
 gtk2-engines-murrine
 gtk2-engines-pixbuf
 gvfs-backends
-hplip
-ayatana-indicator-printers
 inxi
 inputattach
 keyutils
@@ -58,7 +56,6 @@ laptop-detect
 libatk-adaptor
 libcinnamon-desktop4
 libcinnamon-menu-3-0
-libcscreensaver0
 libcvc0
 libgl1-mesa-dri
 libgsettings-qt1
@@ -76,10 +73,6 @@ nemo-data
 nemo-fileroller
 nemo-font-manager
 nemo-gtkhash
-network-manager-gnome
-network-manager-openvpn
-network-manager-ssh
-network-manager-vpnc
 numix-gtk-theme
 numix-icon-theme
 numix-icon-theme-circle
@@ -89,7 +82,8 @@ pamix
 pasystray
 pavucontrol
 pavumeter
-policykit-1
+polkitd
+pkexec
 #printer-driver-all
 profile-sync-daemon
 pulseaudio

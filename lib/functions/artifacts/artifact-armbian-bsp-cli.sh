@@ -60,6 +60,9 @@ function artifact_armbian-bsp-cli_prepare_version() {
 		"INITRD_ARCH: ${INITRD_ARCH}"                                 # /etc/armbian-release
 		"KERNEL_IMAGE_TYPE: ${KERNEL_IMAGE_TYPE}"                     # /etc/armbian-release
 		"VENDOR: ${VENDOR}"                                           # /etc/armbian-release
+		"OVERLAY_DIR: ${OVERLAY_DIR}"                                   # /etc/armbian-release
+		"KERNEL_TARGET: ${KERNEL_TARGET}"                             # /etc/armbian-release
+		"KERNEL_TEST_TARGET: ${KERNEL_TEST_TARGET}"                   # /etc/armbian-release
 		"BOOT_SOC: ${BOOT_SOC}"                                       # /etc/armbian-release # See https://github.com/armbian/build/pull/6411
 		"hash_vars_no_normalize: ${hash_vars_no_normalize}"           # The non-normalized part, above
 	)
@@ -70,7 +73,6 @@ function artifact_armbian-bsp-cli_prepare_version() {
 
 	declare -a dirs_to_hash=(
 		"${SRC}/packages/bsp/common" # common stuff
-		"${SRC}/packages/bsp-cli"
 		"${SRC}/config/optional/_any_board/_packages/bsp-cli"
 		"${SRC}/config/optional/architectures/${ARCH}/_packages/bsp-cli"
 		"${SRC}/config/optional/families/${LINUXFAMILY}/_packages/bsp-cli"
@@ -83,7 +85,7 @@ function artifact_armbian-bsp-cli_prepare_version() {
 
 	# get the hashes of the lib/ bash sources involved...
 	declare hash_files="undetermined"
-	calculate_hash_for_bash_deb_artifact "bsp/armbian-bsp-cli-deb.sh"
+	calculate_hash_for_bash_deb_artifact "bsp/armbian-bsp-cli-deb.sh" "bsp/utils-bsp.sh"
 	declare bash_hash="${hash_files}"
 	declare bash_hash_short="${bash_hash:0:${short_hash_size}}"
 

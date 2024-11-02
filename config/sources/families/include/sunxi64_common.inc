@@ -14,24 +14,29 @@ declare -g BOOTDELAY=1
 declare -g BOOTPATCHDIR="${BOOTPATCHDIR:-"u-boot-sunxi"}"
 declare -g BOOTBRANCH="${BOOTBRANCH:-"tag:v2024.01"}"
 declare -g BOOTENV_FILE='sunxi.txt'
-UBOOT_TARGET_MAP="${UBOOT_TARGET_MAP:-BINMAN_ALLOW_MISSING=1;;u-boot-sunxi-with-spl.bin}"
+declare -g UBOOT_TARGET_MAP="${UBOOT_TARGET_MAP:-BINMAN_ALLOW_MISSING=1;;u-boot-sunxi-with-spl.bin}"
 declare -g BOOTSCRIPT='boot-sun50i-next.cmd:boot.cmd'
+declare -g OVERLAY_DIR="/boot/dtb/allwinner/overlay"
 declare -g LINUXFAMILY=sunxi64
 
+# shellcheck source=config/sources/families/include/crust_firmware.inc
 source "${BASH_SOURCE%/*}/crust_firmware.inc"
 
 case $BRANCH in
 
 	legacy)
 		declare -g KERNEL_MAJOR_MINOR="6.1" # Major and minor versions of this kernel.
+		declare -g KERNELBRANCH="tag:v6.1.104"
 		;;
 
 	current)
 		declare -g KERNEL_MAJOR_MINOR="6.6" # Major and minor versions of this kernel.
+		declare -g KERNELBRANCH="tag:v6.6.54"
 		;;
 
 	edge)
-		declare -g KERNEL_MAJOR_MINOR="6.7" # Major and minor versions of this kernel.
+		declare -g KERNEL_MAJOR_MINOR="6.11" # Major and minor versions of this kernel.
+		declare -g KERNELBRANCH="tag:v6.11.2"
 		;;
 esac
 

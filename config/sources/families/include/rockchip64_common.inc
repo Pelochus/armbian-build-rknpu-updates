@@ -14,6 +14,7 @@ BOOTENV_FILE='rockchip64.txt'
 UBOOT_TARGET_MAP=";;idbloader.bin uboot.img trust.bin"
 BOOTDELAY=0
 OVERLAY_PREFIX="${OVERLAY_PREFIX:-"rockchip"}" # default to 'rockchip' if not set by board
+OVERLAY_DIR="/boot/dtb/rockchip/overlay"
 # SERIALCON is handled/defaulted in hook post_family_config__900_late_default_serial_console_by_branch at end of this file
 GOVERNOR="ondemand"
 ATFPATCHDIR='atf-rockchip64'
@@ -32,7 +33,7 @@ case $BRANCH in
 		;;
 
 	edge)
-		declare -g KERNEL_MAJOR_MINOR="6.8"
+		declare -g KERNEL_MAJOR_MINOR="6.11"
 		declare -g LINUXFAMILY=rockchip64
 		declare -g LINUXCONFIG='linux-rockchip64-'$BRANCH
 		;;
@@ -73,6 +74,20 @@ CPUMIN=${CPUMIN:="408000"}
 declare -g BOOT_SOC_MKIMAGE="${BOOT_SOC}"
 
 case "$BOOT_SOC" in
+	rk3308)
+		CPUMAX=${CPUMAX:="1296000"}
+		BOOT_SCENARIO="${BOOT_SCENARIO:=only-blobs}"
+		DDR_BLOB="${DDR_BLOB:-"rk33/rk3308_ddr_589MHz_uart2_m1_v1.30.bin"}"
+		MINILOADER_BLOB="${MINILOADER_BLOB:-"rk33/rk3308_miniloader_v1.22.bin"}"
+		BL31_BLOB="${BL31_BLOB:-"rk33/rk3308_bl31_v2.22.elf"}"
+
+		if [[ ${BRANCH} == legacy ]]; then
+			DDR_BLOB="${DDR_BLOB:-"rk33/rk3308_ddr_589MHz_uart2_m0_v1.26.bin"}"
+			MINILOADER_BLOB="${MINILOADER_BLOB:-"rk33/rk3308_miniloader_sd_nand_v1.13.bin"}"
+			BL31_BLOB="${BL31_BLOB:-"rk33/rk3308_bl31_v2.10.elf"}"
+		fi
+		;;
+
 	rk3328)
 		CPUMAX=${CPUMAX:="1296000"}
 		BOOT_SCENARIO="${BOOT_SCENARIO:=only-blobs}"
@@ -100,43 +115,44 @@ case "$BOOT_SOC" in
 	rk3528)
 		CPUMAX=${CPUMAX:="2016000"}
 		BOOT_SCENARIO="${BOOT_SCENARIO:=spl-blobs}"
-		DDR_BLOB="${DDR_BLOB:-"rk35/rk3528_ddr_1056MHz_v1.06.bin"}"
-		BL31_BLOB="${BL31_BLOB:-"rk35/rk3528_bl31_v1.16.elf"}"
+		DDR_BLOB="${DDR_BLOB:-"rk35/rk3528_ddr_1056MHz_v1.09.bin"}"
+		BL31_BLOB="${BL31_BLOB:-"rk35/rk3528_bl31_v1.17.elf"}"
 		;;
 
 	rk3566)
 		CPUMAX=${CPUMAX:="1800000"}
 		BOOT_SCENARIO="${BOOT_SCENARIO:=spl-blobs}"
-		DDR_BLOB="${DDR_BLOB:-"rk35/rk3566_ddr_1056MHz_v1.10.bin"}"
-		BL31_BLOB="${BL31_BLOB:-"rk35/rk3568_bl31_v1.29.elf"}"
+		DDR_BLOB="${DDR_BLOB:-"rk35/rk3566_ddr_1056MHz_v1.21.bin"}"
+		BL31_BLOB="${BL31_BLOB:-"rk35/rk3568_bl31_v1.44.elf"}"
+		# ROCKUSB_BLOB is used to flash a board with rkdeveloptool (Linux, can use 'rkdevflash' extension) or RKDevTool (Windows) in MASKROM mode
+		ROCKUSB_BLOB="rk35/rk356x_spl_loader_v1.21.113.bin"
 		BOOT_SOC_MKIMAGE="rk3568" # mkimage does not know about rk3566, and rk3568 works.
+		BOOTENV_FILE='rk356x.txt'
 		;;
 
 	rk3568)
 		CPUMAX=${CPUMAX:="1992000"}
 		BOOT_SCENARIO="${BOOT_SCENARIO:=spl-blobs}"
-		DDR_BLOB="${DDR_BLOB:-"rk35/rk3568_ddr_1560MHz_v1.13.bin"}"
-		BL31_BLOB="${BL31_BLOB:-"rk35/rk3568_bl31_v1.32.elf"}"
+		DDR_BLOB="${DDR_BLOB:-"rk35/rk3568_ddr_1560MHz_v1.21.bin"}"
+		BL31_BLOB="${BL31_BLOB:-"rk35/rk3568_bl31_v1.44.elf"}"
+		# ROCKUSB_BLOB is used to flash a board with rkdeveloptool (Linux, can use 'rkdevflash' extension) or RKDevTool (Windows) in MASKROM mode
+		ROCKUSB_BLOB="rk35/rk356x_spl_loader_v1.21.113.bin"
+		BOOTENV_FILE='rk356x.txt'
+		;;
+
+	rk3576)
+		BOOT_SCENARIO="${BOOT_SCENARIO:=spl-blobs}"
+		DDR_BLOB="${DDR_BLOB:-"rk35/rk3576_ddr_lp4_2112MHz_lp5_2736MHz_v1.03.bin"}"
+		BL31_BLOB="${BL31_BLOB:-"rk35/rk3576_bl31_v1.04.elf"}"
+		BL32_BLOB="${BL32_BLOB:-"rk35/rk3576_bl32_v1.01.bin"}"
 		;;
 
 	rk3588) #CPUMAX undefined?
 		BOOT_SCENARIO="${BOOT_SCENARIO:=spl-blobs}"
-		DDR_BLOB="${DDR_BLOB:-"rk35/rk3588_ddr_lp4_2112MHz_lp5_2736MHz_v1.08.bin"}"
-		BL31_BLOB="${BL31_BLOB:-"rk35/rk3588_bl31_v1.28.elf"}"
-		;;
-
-	rk3308)
-		CPUMAX=${CPUMAX:="1296000"}
-		BOOT_SCENARIO="${BOOT_SCENARIO:=only-blobs}"
-		DDR_BLOB="${DDR_BLOB:-"rk33/rk3308_ddr_589MHz_uart2_m1_v1.30.bin"}"
-		MINILOADER_BLOB="${MINILOADER_BLOB:-"rk33/rk3308_miniloader_v1.22.bin"}"
-		BL31_BLOB="${BL31_BLOB:-"rk33/rk3308_bl31_v2.22.elf"}"
-
-		if [[ ${BRANCH} == legacy ]]; then
-			DDR_BLOB="${DDR_BLOB:-"rk33/rk3308_ddr_589MHz_uart2_m0_v1.26.bin"}"
-			MINILOADER_BLOB="${MINILOADER_BLOB:-"rk33/rk3308_miniloader_sd_nand_v1.13.bin"}"
-			BL31_BLOB="${BL31_BLOB:-"rk33/rk3308_bl31_v2.10.elf"}"
-		fi
+		DDR_BLOB="${DDR_BLOB:-"rk35/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin"}"
+		BL31_BLOB="${BL31_BLOB:-"rk35/rk3588_bl31_v1.45.elf"}"
+		# ROCKUSB_BLOB is used to flash a board with rkdeveloptool (Linux, can use 'rkdevflash' extension) or RKDevTool (Windows) in MASKROM mode
+		ROCKUSB_BLOB="rk35/rk3588_spl_loader_v1.16.113.bin"
 		;;
 esac
 
@@ -173,6 +189,10 @@ prepare_boot_configuration() {
 			ATF_COMPILE='no'
 			;;
 	esac
+
+	if [[ ! -z $BL32_BLOB ]]; then
+		UBOOT_TARGET_MAP="BL32=$RKBIN_DIR/$BL32_BLOB ${UBOOT_TARGET_MAP}"
+	fi
 
 	if [[ $BOOT_SUPPORT_SPI == yes ]]; then
 

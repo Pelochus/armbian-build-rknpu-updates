@@ -68,7 +68,7 @@ function create_new_rootfs_cache_via_debootstrap() {
 	display_alert "Preparing debootstrap" "for ${DISTRIBUTION}'s ${RELEASE}" "info"
 	case "${DISTRIBUTION}" in
 		Ubuntu)
-			GIT_FIXED_WORKDIR="debootstrap-ubuntu-devel" fetch_from_repo "https://git.launchpad.net/ubuntu/+source/debootstrap" "debootstrap-ubuntu-devel" "branch:ubuntu/devel"
+			GIT_FIXED_WORKDIR="debootstrap-ubuntu-devel" fetch_from_repo "https://git.launchpad.net/ubuntu/+source/debootstrap" "debootstrap-ubuntu-devel" "tag:import/1.0.118ubuntu1.13"
 			debootstrap_wanted_dir="${SRC}/cache/sources/debootstrap-ubuntu-devel"
 			debootstrap_default_script="gutsy"
 			;;
@@ -224,7 +224,7 @@ function create_new_rootfs_cache_via_debootstrap() {
 
 	# stage: check md5 sum of installed packages. Just in case. @TODO: rpardini: this should also be done when a cache is used, not only when it is created
 	# lets check only for supported targets only unless forced
-	if [[ "${DISTRIBUTION_STATUS}" == "supported" || "${FORCE_CHECK_MD5_PACKAGES:-"no"}" == "yes" ]]; then
+	if [[ "${DISTRIBUTION_STATUS}" == "supported" && "${FORCE_CHECK_MD5_PACKAGES:-"no"}" == "yes" ]]; then
 		display_alert "Checking MD5 sum of installed packages" "debsums" "info"
 		declare -g if_error_detail_message="Check MD5 sum of installed packages failed"
 		chroot_sdcard debsums --silent

@@ -53,7 +53,7 @@ function compile_kernel() {
 	declare hash pre_patch_version
 	kernel_main_patching # has it's own logging sections inside
 
-	# Stop after patching;
+	# Stop after patching.
 	if [[ "${PATCH_ONLY}" == yes ]]; then
 		display_alert "PATCH_ONLY is set, stopping." "PATCH_ONLY=yes and patching success" "cachehit"
 		return 0
@@ -72,7 +72,6 @@ function compile_kernel() {
 	# re-read kernel version after patching
 	declare version
 	version=$(grab_version "$kernel_work_dir")
-	display_alert "Compiling $BRANCH kernel" "$version" "info"
 
 	# determine the toolchain
 	declare toolchain
@@ -80,12 +79,22 @@ function compile_kernel() {
 
 	kernel_config # has it's own logging sections inside
 
+	# Validate dts file if flag is set and stop after validation.
+	# Has to happen after kernel .config file was created
+	if [[ "${DTS_VALIDATE}" == yes ]]; then
+		LOG_SECTION="validate_dts" do_with_logging validate_dts
+		display_alert "DTS_VALIDATE is set, stopping." "DTS_VALIDATE=yes and dts sucessfully checked. See output above to fix your board's dts file." "cachehit"
+		return 0
+	fi
+
 	# Stop after configuring kernel, but only if using a specific CLI command ("kernel-config").
 	# Normal "KERNEL_CONFIGURE=yes" (during image build) is still allowed.
 	if [[ "${KERNEL_CONFIGURE}" == yes && "${ARMBIAN_COMMAND}" == *kernel-config ]]; then
 		display_alert "Stopping after configuring kernel" "" "cachehit"
 		return 0
 	fi
+
+	display_alert "Compiling $BRANCH kernel" "$version" "info"
 
 	# build via make and package .debs; they're separate sub-steps
 	kernel_prepare_build_and_package # has it's own logging sections inside
@@ -186,6 +195,12 @@ function kernel_dtb_only_build() {
 		if [[ -z "${fdt_dir}" || -z "${fdt_file}" ]]; then
 			exit_with_error "Failed to parse BOOT_FDT_FILE: ${BOOT_FDT_FILE}"
 		fi
+
+		# Copy the bin dtb for convenience
+		display_alert "Kernel DTB-only for development" "Copying binary ${BOOT_FDT_FILE}" "warn"
+		declare binary_dtb="${kernel_work_dir}/arch/${ARCH}/boot/dts/${fdt_dir}/${fdt_file}"
+		declare binary_dtb_dest="${SRC}/output/${fdt_dir}-${fdt_file}--${KERNEL_MAJOR_MINOR}-${BRANCH}.dtb"
+		run_host_command_logged cp -v "${binary_dtb}" "${binary_dtb_dest}"
 
 		# Kernel build should produce a preprocessed version of all DTS files built into DTBs at arch/arm64/boot/dts/${fdt_dir}/.${fdt_file}.dts.tmp
 		declare preprocessed_fdt_source="${kernel_work_dir}/arch/${ARCH}/boot/dts/${fdt_dir}/.${fdt_file}.dts.tmp"

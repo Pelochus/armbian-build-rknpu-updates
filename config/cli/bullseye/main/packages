@@ -1,10 +1,7 @@
 alsa-utils
 bc
 bridge-utils
-chrony
-command-not-found
 console-setup
-cpufrequtils
 cron
 curl
 dbus-user-session
@@ -18,7 +15,7 @@ fake-hwclock
 fdisk
 figlet
 htop
-inetutils-ping
+iputils-ping
 init
 initramfs-tools
 iw
@@ -31,8 +28,6 @@ man-db
 mmc-utils
 ncurses-term
 nano
-netplan.io
-network-manager
 openssh-server
 parted
 psmisc
@@ -40,12 +35,10 @@ rsync
 rsyslog
 sudo
 sysfsutils
-sysstat
 toilet
 tzdata
 u-boot-tools
 usbutils
 vlan
 wget
-wireless-tools
 wpasupplicant

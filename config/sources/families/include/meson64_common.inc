@@ -16,6 +16,7 @@ SRC_LOADADDR='LOADADDR=0x1080000'
 BOOTBRANCH="${BOOTBRANCH_BOARD:-"tag:v2022.07"}"
 BOOTPATCHDIR="${BOOTPATCHDIR:-"v2022.07"}"
 OVERLAY_PREFIX='meson'
+OVERLAY_DIR="/boot/dtb/amlogic/overlay"
 
 # This is an extension method, put directly in meson64_common. A "built-in" extension if you will.
 # Bring in LibreELEC's amlogic-boot-fip repo, which is the authoritative source for FIP blobs.
@@ -45,7 +46,7 @@ case $BRANCH in
 		declare -g KERNEL_MAJOR_MINOR="6.6"
 		;;
 	edge)
-		declare -g KERNEL_MAJOR_MINOR="6.8"
+		declare -g KERNEL_MAJOR_MINOR="6.11"
 		;;
 
 esac
@@ -287,7 +288,7 @@ family_tweaks_bsp() {
 				EndSection
 			EOF
 			;;
-		"odroidn2" | "odroidc4" | "khadas-vim2" | "odroidhc4" | "khadas-vim3" | "khadas-vim3l" | "radxa-zero" | "radxa-zero2" | "bananapi-m2s")
+		"jethubj200" | "odroidn2" | "odroidc4" | "khadas-vim2" | "odroidhc4" | "khadas-vim3" | "khadas-vim3l" | "radxa-zero" | "radxa-zero2" | "bananapi-m2s")
 			cat <<- EOF > "$destination"/etc/X11/xorg.conf
 				Section "Device"
 				    Identifier  "DRM Graphics Acclerated"

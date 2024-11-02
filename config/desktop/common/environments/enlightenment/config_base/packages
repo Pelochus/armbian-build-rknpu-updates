@@ -27,8 +27,6 @@ fonts-dejavu-core
 fonts-freefont-ttf
 fonts-guru
 fonts-guru-extra
-fonts-kacst
-fonts-kacst-one
 fonts-khmeros-core
 fonts-liberation
 fonts-nanum
@@ -87,8 +85,6 @@ libnotify-bin
 libplank1
 libplank-common
 libproxy1-plugin-gsettings
-libproxy1-plugin-networkmanager
-libu2f-udev
 libwmf0.2-7-gtk
 libxcursor1
 lightdm
@@ -96,10 +92,6 @@ lxtask
 mesa-utils
 mousepad
 mousetweaks
-network-manager-config-connectivity-ubuntu
-network-manager-openvpn
-network-manager-ssh
-network-manager-vpnc
 numix-blue-gtk-theme
 numix-gtk-theme
 numix-icon-theme

@@ -29,8 +29,6 @@ fonts-dejavu-core
 fonts-freefont-ttf
 fonts-guru
 fonts-guru-extra
-fonts-kacst
-fonts-kacst-one
 fonts-liberation
 fonts-nanum
 fonts-opensymbol
@@ -49,7 +47,6 @@ gstreamer1.0-packagekit
 gstreamer1.0-plugins-base-apps
 gstreamer1.0-pulseaudio
 gvfs-backends
-hplip
 inputattach
 inxi
 keyutils
@@ -66,8 +63,6 @@ libgnome-bluetooth13
 libgsettings-qt1
 libnotify-bin
 libproxy1-plugin-gsettings
-libproxy1-plugin-networkmanager
-libu2f-udev
 libwmf0.2-7-gtk
 libxapp1
 libxcursor1
@@ -76,8 +71,6 @@ lightdm-gtk-greeter
 lightdm-gtk-greeter-settings
 lightdm-settings
 mousetweaks
-network-manager-openvpn-gnome
-network-manager-vpnc
 nitrogen
 numix-gtk-theme
 openprinting-ppds
@@ -88,9 +81,9 @@ pasystray
 pavucontrol
 pavucontrol-qt
 pavumeter
-policykit-1
-policykit-1-gnome
-#printer-driver-all
+polkitd
+pkexec
+printer-driver-all
 profile-sync-daemon
 pulseaudio-module-bluetooth
 rofi

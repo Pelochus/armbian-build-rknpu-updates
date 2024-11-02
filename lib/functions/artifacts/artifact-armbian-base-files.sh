@@ -55,7 +55,7 @@ function artifact_armbian-base-files_prepare_version() {
 
 	artifact_name="armbian-base-files-${RELEASE}-${ARCH}"
 	artifact_type="deb"
-	artifact_deb_repo="${RELEASE}" # release-specific repo (jammy etc)
+	artifact_deb_repo="extra/${RELEASE}-utils" # release-specific repo (jammy etc)
 	artifact_deb_arch="${ARCH}"    # arch-specific packages (arm64 etc)
 	artifact_map_packages=(["armbian-base-files"]="base-files")
 
@@ -147,18 +147,18 @@ function compile_armbian-base-files() {
 	# Create preinst file if not exists (Debian)
 	if [[ ! -e "${destination}"/DEBIAN/preinst ]]; then
 		cat <<- EOD >> "${destination}"/DEBIAN/preinst
-		#!/bin/sh
-		set -e
-		# Start of automatically added by ${VENDOR}
-		rm -f /etc/dpkg/origins/default # reset default link
-		# End of automatically added by ${VENDOR}
+			#!/bin/sh
+			set -e
+			# Start of automatically added by ${VENDOR}
+			rm -f /etc/dpkg/origins/default # reset default link
+			# End of automatically added by ${VENDOR}
 		EOD
 		chmod 0755 "${destination}"/DEBIAN/preinst
 	else
 		cat <<- EOD >> "${destination}"/DEBIAN/preinst
-		# Start of automatically added by ${VENDOR}
-		rm -f /etc/dpkg/origins/default # reset default link
-		# End of automatically added by ${VENDOR}
+			# Start of automatically added by ${VENDOR}
+			rm -f /etc/dpkg/origins/default # reset default link
+			# End of automatically added by ${VENDOR}
 		EOD
 	fi
 

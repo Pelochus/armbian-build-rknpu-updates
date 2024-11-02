@@ -61,6 +61,26 @@ function do_main_configuration() {
 
 	declare -g SKIP_EXTERNAL_TOOLCHAINS="${SKIP_EXTERNAL_TOOLCHAINS:-yes}" # don't use any external toolchains, by default.
 
+	# Network stack to use, default to network-manager; configuration can override this.
+	# Will be made read-only further down.
+	declare -g NETWORKING_STACK="${NETWORKING_STACK}"
+
+	# If empty, default depending on BUILD_MINIMAL; if yes, use systemd-networkd; if no, use network-manager.
+	if [[ -z "${NETWORKING_STACK}" ]]; then
+		display_alert "NETWORKING_STACK not set" "Calculating defaults" "debug"
+		# Network-manager and Chrony for standard CLI and desktop, systemd-networkd and systemd-timesyncd for minimal
+		# systemd-timesyncd is slimmer and less resource intensive than Chrony, see https://unix.stackexchange.com/questions/504381/chrony-vs-systemd-timesyncd-what-are-the-differences-and-use-cases-as-ntp-cli
+		if [[ "${BUILD_MINIMAL}" == "yes" ]]; then
+			display_alert "BUILD_MINIMAL is set to yes" "Using systemd-networkd" "debug"
+			NETWORKING_STACK="systemd-networkd"
+		else
+			display_alert "BUILD_MINIMAL not set to yes" "Using network-manager" "debug"
+			NETWORKING_STACK="network-manager"
+		fi
+	else
+		display_alert "NETWORKING_STACK is preset during configuration" "NETWORKING_STACK: ${NETWORKING_STACK}" "debug"
+	fi
+
 	# Timezone
 	if [[ -f /etc/timezone ]]; then # Timezone for target is taken from host, if it exists.
 		TZDATA=$(cat /etc/timezone)
@@ -73,7 +93,7 @@ function do_main_configuration() {
 	USEALLCORES=yes # Use all CPU cores for compiling
 
 	[[ -z $EXIT_PATCHING_ERROR ]] && EXIT_PATCHING_ERROR="" # exit patching if failed
-	[[ -z $HOST ]] && HOST="$BOARD"                         # set hostname to the board
+	[[ -z $HOST ]] && HOST="$BOARD"
 	cd "${SRC}" || exit
 
 	[[ -z "${CHROOT_CACHE_VERSION}" ]] && CHROOT_CACHE_VERSION=7
@@ -166,8 +186,9 @@ function do_main_configuration() {
 		china)
 			[[ -z $USE_MAINLINE_GOOGLE_MIRROR ]] && [[ -z $MAINLINE_MIRROR ]] && MAINLINE_MIRROR=tuna
 			[[ -z $USE_GITHUB_UBOOT_MIRROR ]] && [[ -z $UBOOT_MIRROR ]] && UBOOT_MIRROR=gitee
-			[[ -z $GITHUB_MIRROR ]] && GITHUB_MIRROR=gitclone
+			[[ -z $GITHUB_MIRROR ]] && GITHUB_MIRROR=ghproxy
 			[[ -z $DOWNLOAD_MIRROR ]] && DOWNLOAD_MIRROR=china
+			[[ -z $GHCR_MIRROR ]] && GHCR_MIRROR=nju
 			;;
 		*) ;;
 
@@ -218,7 +239,7 @@ function do_main_configuration() {
 			declare -g -r GITHUB_SOURCE='https://hub.fastgit.xyz'
 			;;
 		ghproxy)
-			[[ -z $GHPROXY_ADDRESS ]] && GHPROXY_ADDRESS=mirror.ghproxy.com
+			[[ -z $GHPROXY_ADDRESS ]] && GHPROXY_ADDRESS=ghp.ci
 			declare -g -r GITHUB_SOURCE="https://${GHPROXY_ADDRESS}/https://github.com"
 			;;
 		gitclone)
@@ -231,7 +252,11 @@ function do_main_configuration() {
 
 	case $GHCR_MIRROR in
 		dockerproxy)
-			declare -g -r GHCR_SOURCE='ghcr.dockerproxy.com'
+			GHCR_MIRROR_ADDRESS="${GHCR_MIRROR_ADDRESS:-"ghcr.dockerproxy.com"}"
+			declare -g -r GHCR_SOURCE=$GHCR_MIRROR_ADDRESS
+			;;
+		nju)
+			declare -g -r GHCR_SOURCE='ghcr.nju.edu.cn'
 			;;
 		*)
 			declare -g -r GHCR_SOURCE='ghcr.io'
@@ -240,7 +265,7 @@ function do_main_configuration() {
 
 	# Let's set default data if not defined in board configuration above
 	[[ -z $OFFSET ]] && OFFSET=4 # offset to 1st partition (we use 4MiB boundaries by default)
-	[[ -z $ARCH ]] && ARCH=armhf # makes little sense to default to anything... # @TODO: remove
+	[[ -z $ARCH ]] && ARCH=arm64 # makes little sense to default to anything... # @TODO: remove, but check_config_userspace_release_and_desktop requires it
 	ATF_COMPILE=yes              # @TODO: move to armhf/arm64
 	[[ -z $WIREGUARD ]] && WIREGUARD="yes"
 	[[ -z $EXTRAWIFI ]] && EXTRAWIFI="yes"
@@ -254,13 +279,41 @@ function do_main_configuration() {
 	# single ext4 partition is the default and preferred configuration
 	#BOOTFS_TYPE=''
 
-	## ------ Sourcing family config ---------------------------
+	###
+	### ------------------- Sourcing family config -------------------
+	###
 	source_family_config_and_arch
 
 	if [[ "$HAS_VIDEO_OUTPUT" == "no" ]]; then
 		PLYMOUTH="no"
 		[[ $BUILD_DESKTOP != "no" ]] && exit_with_error "HAS_VIDEO_OUTPUT is set to no. So we shouldn't build desktop environment"
 	fi
+
+	# Make NETWORKING_STACK read-only, as further changes would make the whole thing inconsistent.
+	# But only after family config to allow family to change it (post-family hooks CANNOT change NETWORKING_STACK since the hook is running after this).
+	# Individual networking extensions should _check_ this to make there's no spurious enablement.
+	display_alert "Using NETWORKING_STACK" "NETWORKING_STACK: ${NETWORKING_STACK}" "info"
+	declare -g -r NETWORKING_STACK="${NETWORKING_STACK}"
+
+	# Now enable extensions according to the configuration.
+	case "${NETWORKING_STACK}" in
+		"network-manager")
+			display_alert "Adding networking extensions" "net-network-manager, net-chrony" "info"
+			enable_extension "net-network-manager"
+			enable_extension "net-chrony"
+			;;
+		"systemd-networkd")
+			display_alert "Adding networking extensions" "net-systemd-networkd, net-systemd-timesyncd" "info"
+			enable_extension "net-systemd-networkd"
+			enable_extension "net-systemd-timesyncd"
+			;;
+		"none")
+			display_alert "NETWORKING_STACK=${NETWORKING_STACK}" "Not adding networking extensions" "info"
+			;;
+		*)
+			display_alert "NETWORKING_STACK=${NETWORKING_STACK}" "Invalid value? Not adding networking extensions" "wrn"
+			;;
+	esac
 
 	## Extensions: at this point we've sourced all the config files that will be used,
 	##             and (hopefully) not yet invoked any extension methods. So this is the perfect
@@ -307,7 +360,7 @@ function do_extra_configuration() {
 	[[ -z $BOOTPATCHDIR ]] && BOOTPATCHDIR="u-boot-$LINUXFAMILY" # @TODO move to hook
 	[[ -z $ATFPATCHDIR ]] && ATFPATCHDIR="atf-$LINUXFAMILY"
 
-	if [[ "$RELEASE" =~ ^(focal|jammy|kinetic|lunar|mantic|noble)$ ]]; then
+	if [[ "$RELEASE" =~ ^(focal|jammy|noble|oracular)$ ]]; then
 		DISTRIBUTION="Ubuntu"
 	else
 		DISTRIBUTION="Debian"
@@ -358,6 +411,7 @@ function do_extra_configuration() {
 	#         in case the user tries to use them in lib.config, hopefully they'll be detected as "wishful hooking" and the user will be wrn'ed.
 	if [[ -f $USERPATCHES_PATH/lib.config ]]; then
 		display_alert "Using user configuration override" "$USERPATCHES_PATH/lib.config" "info"
+		# shellcheck source=/dev/null
 		source "$USERPATCHES_PATH"/lib.config
 		track_general_config_variables "after sourcing lib.config"
 	fi
@@ -528,8 +582,8 @@ function set_git_build_repo_url_and_commit_vars() {
 
 function check_filesystem_compatibility_on_host() {
 	if [[ -f "/proc/filesystems" ]]; then
-			# Check if the filesystem is listed in /proc/filesystems
-		if ! grep -q "\<$ROOTFS_TYPE\>" /proc/filesystems; then		# ensure exact match with \<...\>
+		# Check if the filesystem is listed in /proc/filesystems
+		if ! grep -q "\<$ROOTFS_TYPE\>" /proc/filesystems; then # ensure exact match with \<...\>
 			# Try modprobing the fs module since it doesn't show up in /proc/filesystems if it's an unloaded module versus built-in
 			if ! modprobe "$ROOTFS_TYPE"; then
 				exit_with_error "Filesystem type unsupported by build host:" "$ROOTFS_TYPE"
@@ -559,8 +613,8 @@ function check_filesystem_compatibility_on_host() {
 
 			# Check if required configurations are set
 			if [ -n "$build_host_kernel_config" ]; then
-				if ! grep -q '^CONFIG_F2FS_FS_XATTR=y$' "$build_host_kernel_config" || \
-				! grep -q '^CONFIG_F2FS_FS_SECURITY=y$' "$build_host_kernel_config"; then
+				if ! grep -q '^CONFIG_F2FS_FS_XATTR=y$' "$build_host_kernel_config" ||
+					! grep -q '^CONFIG_F2FS_FS_SECURITY=y$' "$build_host_kernel_config"; then
 					exit_with_error "Required kernel configurations for f2fs filesystem not enabled." "Please enable CONFIG_F2FS_FS_XATTR and CONFIG_F2FS_FS_SECURITY in your kernel configuration." "err"
 				fi
 			fi
@@ -569,4 +623,19 @@ function check_filesystem_compatibility_on_host() {
 		display_alert "Could not check filesystem support via /proc/filesystems on build host." "Build might fail in case of unsupported rootfs type." "wrn"
 	fi
 	return 0
+}
+
+function pre_install_distribution_specific__disable_cnf_apt_hook() {
+	if [[ $(dpkg --print-architecture) != "${ARCH}" && -f "${SDCARD}"/etc/apt/apt.conf.d/50command-not-found ]]; then #disable command-not-found (60% build-time saved under qemu)
+		display_alert "Disabling command-not-found during build-time to speed up image creation" "${BOARD}:${RELEASE}-${BRANCH}" "info"
+		run_host_command_logged mv "${SDCARD}"/etc/apt/apt.conf.d/50command-not-found "${SDCARD}"/etc/apt/apt.conf.d/50command-not-found.disabled
+	fi
+}
+
+function post_post_debootstrap_tweaks__restore_cnf_apt_hook() {
+	if [ -f "${SDCARD}"/etc/apt/apt.conf.d/50command-not-found.disabled ]; then # (re-enable command-not-found after building rootfs if it's been disabled)
+		display_alert "Enabling command-not-found after build-time " "${BOARD}:${RELEASE}-${BRANCH}" "info"
+		run_host_command_logged mv "${SDCARD}"/etc/apt/apt.conf.d/50command-not-found.disabled "${SDCARD}"/etc/apt/apt.conf.d/50command-not-found
+	fi
+
 }

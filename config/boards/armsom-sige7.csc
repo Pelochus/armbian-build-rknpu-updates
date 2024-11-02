@@ -1,10 +1,9 @@
 # Rockchip RK3588 SoC octa core 8-64GB SoC 2*2.5GBe eMMC USB3 NvME WIFI
 BOARD_NAME="ArmSoM Sige7"
 BOARDFAMILY="rockchip-rk3588"
-BOARD_MAINTAINER="Z-Keven"
+BOARD_MAINTAINER=""
 BOOTCONFIG="armsom-sige7-rk3588_defconfig"
-KERNEL_TARGET="legacy,vendor,edge,collabora"
-KERNEL_TEST_TARGET="legacy" # in case different then kernel target
+KERNEL_TARGET="edge,current,vendor"
 FULL_DESKTOP="yes"
 BOOT_LOGO="desktop"
 BOOT_FDT_FILE="rockchip/rk3588-armsom-sige7.dtb"
@@ -12,20 +11,10 @@ BOOT_SCENARIO="spl-blobs"
 BOOT_SUPPORT_SPI="yes"
 BOOT_SPI_RKSPI_LOADER="yes"
 IMAGE_PARTITION_TABLE="gpt"
-BOOTFS_TYPE="ext4"
+
+# @TODO: consider removing those, as the defaults in rockchip64_common have been bumped up
 DDR_BLOB='rk35/rk3588_ddr_lp4_2112MHz_lp5_2736MHz_v1.11.bin'
 BL31_BLOB='rk35/rk3588_bl31_v1.38.elf'
-
-# post_family_config hook runs in all branch.
-function post_family_config__uboot_armsom() {
-	display_alert "$BOARD" "Configuring armsom u-boot" "info"
-	declare -g BOOTSOURCE='https://github.com/radxa/u-boot.git'
-	declare -g BOOTBRANCH="commit:b54d452d46459bc6e4cfc1a2795c9aad143aa174" # specific commit in next-dev branch
-	declare -g OVERLAY_PREFIX='rockchip-rk3588'
-	declare -g BOOTDIR="u-boot-${BOARD}"                  # do not share u-boot directory
-	declare -g BOOTPATCHDIR="legacy/u-boot-armsom-rk3588" # Few patches in there; defconfig & DT
-	declare -g BOOTDELAY=1                                # build injects this into u-boot config. we can then get into UMS mode and avoid the whole rockusb/rkdeveloptool thing
-}
 
 function post_family_tweaks__armsom-sige7_naming_audios() {
 	display_alert "$BOARD" "Renaming armsom-sige7 audios" "info"

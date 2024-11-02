@@ -6,8 +6,8 @@ BOARDFAMILY="sun50iw1"
 
 BOARD_MAINTAINER="Kreyren"
 
-# Legacy has been removed as it's too old and disfunctional for this board
 KERNEL_TARGET="legacy,current,edge"
+KERNEL_TEST_TARGET="current"
 
 # NOTE(Krey): IMAGE_PARTITION_TABLE="gpt" was not tested, uses msdos by default
 

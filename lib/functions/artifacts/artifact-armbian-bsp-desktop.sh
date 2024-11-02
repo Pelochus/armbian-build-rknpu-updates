@@ -37,7 +37,7 @@ function artifact_armbian-bsp-desktop_prepare_version() {
 
 	# get the hashes of the lib/ bash sources involved...
 	declare hash_files="undetermined"
-	calculate_hash_for_bash_deb_artifact "bsp/armbian-bsp-desktop-deb.sh"
+	calculate_hash_for_bash_deb_artifact "bsp/armbian-bsp-desktop-deb.sh" "bsp/utils-bsp.sh"
 	declare bash_hash="${hash_files}"
 	declare bash_hash_short="${bash_hash:0:${short_hash_size}}"
 
@@ -53,7 +53,7 @@ function artifact_armbian-bsp-desktop_prepare_version() {
 
 	artifact_name="armbian-bsp-desktop-${BOARD}-${BRANCH}"
 	artifact_type="deb"
-	artifact_deb_repo="${RELEASE}"
+	artifact_deb_repo="extra/${RELEASE}-desktop"
 	artifact_deb_arch="${ARCH}"
 
 	artifact_map_packages=(["armbian-bsp-desktop"]="${artifact_name}")
