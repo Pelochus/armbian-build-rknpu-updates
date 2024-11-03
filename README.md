@@ -1,6 +1,6 @@
-# Modified Armbian for running 0.9.6 RKNPU with Kernel 6.1
+# Modified Armbian for running latest RKNPU driver
 
-This forks purposes is to run LLMs on Rockchip devices with NPUs using RKLLM. Check the following links:
+This fork purpose is to run LLMs on Rockchip devices with NPUs using RKLLM. Check the following links:
 - https://github.com/Pelochus/ezrknpu
 - https://github.com/Pelochus/ezrknn-llm
 
