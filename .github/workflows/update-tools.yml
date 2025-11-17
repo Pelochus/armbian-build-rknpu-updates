@@ -84,7 +84,7 @@ jobs:
           {
             echo "CHANGE_LOG<<EOFFEOFFF42"                          # Has to be a unique delimiter that doesn't appear in the changelog itself
             curl --silent "https://api.github.com/repos/${{ matrix.tool.PROJECT_NAME }}/releases/latest" | jq -r .body \
-            | sed -E -e 's/(#([0-9]+))/${{ matrix.tool.USER_NAME }}\/${{ matrix.tool.REPO_NAME }}\1/g' \
+            | sed -E -e -e 's/@/@ /g' \
             -e 's/https\:\/\/github\.com/https\:\/\/redirect.github.com/g'
             echo "EOFFEOFFF42"
           } >> "$GITHUB_ENV"
